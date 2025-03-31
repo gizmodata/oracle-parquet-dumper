@@ -57,11 +57,11 @@ Options:
   --version / --no-version        Prints the Oracle Parquet Dumper utility
                                   version and exits.  [required]
   --username TEXT                 The Oracle database username to connect
-                                  with.  [default: truck_cab; required]
+                                  with.  [required]
   --password TEXT                 The Oracle database password to connect
                                   with.  [required]
   --hostname TEXT                 The Oracle database hostname to connect to.
-                                  [default: oracle.truckcab.us; required]
+                                  [required]
   --service-name TEXT             The Oracle database service name to connect
                                   to.  [default:
                                   tcmpdb.sub10220134280.tcmvcn1.oraclevcn.com;
@@ -70,8 +70,7 @@ Options:
                                   [default: 1521; required]
   --schema TEXT                   The schema to export objects for, may be
                                   specified more than once.  Defaults to the
-                                  database username.  [default: TRUCK_CAB;
-                                  required]
+                                  database username.  [required]
   --table-name-include-pattern TEXT
                                   The regexp pattern to use to filter object
                                   names to include in the export.  [default:
