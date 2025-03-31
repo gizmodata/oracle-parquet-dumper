@@ -63,9 +63,7 @@ Options:
   --hostname TEXT                 The Oracle database hostname to connect to.
                                   [required]
   --service-name TEXT             The Oracle database service name to connect
-                                  to.  [default:
-                                  tcmpdb.sub10220134280.tcmvcn1.oraclevcn.com;
-                                  required]
+                                  to.  [required]
   --port INTEGER                  The Oracle database port to connect to.
                                   [default: 1521; required]
   --schema TEXT                   The schema to export objects for, may be
