@@ -2,7 +2,7 @@
 
 [<img src="https://img.shields.io/badge/GitHub-gizmodata%2Foracle--parquet--dumper-blue.svg?logo=Github">](https://github.com/gizmodata/oracle-parquet-dumper)
 [![oracle-parquet-dumper-ci](https://github.com/gizmodata/oracle-parquet-dumper/actions/workflows/ci.yml/badge.svg)](https://github.com/gizmodata/oracle-parquet-dumper/actions/workflows/ci.yml)
-[![Supported Python Versions](https://img.shields.io/pypi/pyversions/sidewinder-db)](https://pypi.org/project/sidewinder-db/)
+[![Supported Python Versions](https://img.shields.io/pypi/pyversions/oracle-parquet-dumper)](https://pypi.org/project/oracle-parquet-dumper/)
 [![PyPI version](https://badge.fury.io/py/oracle-parquet-dumper.svg)](https://badge.fury.io/py/oracle-parquet-dumper)
 [![PyPI Downloads](https://img.shields.io/pypi/dm/oracle-parquet-dumper.svg)](https://pypi.org/project/oracle-parquet-dumper/)
 
@@ -37,7 +37,7 @@ python3 -m venv .venv
 # Upgrade pip, setuptools, and wheel
 pip install --upgrade pip setuptools wheel
 
-# Install Sidewinder-DB - in editable mode with dev dependencies
+# Install Oracle Parquet Dumper in editable mode with dev dependencies
 pip install --editable .[dev]
 ```
 
