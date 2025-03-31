@@ -14,7 +14,7 @@ include = ["*"]  # package names should match these glob patterns (["*"] by defa
 
 [project]
 name = "oracle-parquet-dumper"
-version = "0.0.4"
+version = "0.0.5"
 description = "A Python-based tool for dumping Oracle database table data to parquet files"
 readme = "README.md"
 authors = [{ name = "Philip Moore", email = "philip@gizmodata.com" }]
@@ -47,7 +47,7 @@ Homepage = "https://github.com/gizmodata/oracle-parquet-dumper"
 oracle-parquet-dumper = "oracle_parquet_dumper.main:main"
 
 [tool.bumpver]
-current_version = "0.0.4"
+current_version = "0.0.5"
 version_pattern = "MAJOR.MINOR.PATCH[PYTAGNUM]"
 commit_message = "bump version {old_version} -> {new_version}"
 commit = true
