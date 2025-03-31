@@ -7,7 +7,7 @@ from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 from textwrap import shorten
-from typing import List
+from typing import List, Generator
 
 import click
 import oracledb
@@ -73,7 +73,7 @@ class OracleParquetDumper:
             oracledb.init_oracle_client(lib_dir=os.getenv("ORACLE_LIB_DIR", os.getenv("ORACLE_HOME", "") + "/lib"))
 
     @contextmanager
-    def get_db_connection(self) -> oracledb.Connection:
+    def get_db_connection(self) -> Generator[oracledb.Connection, None, None]:
         con = oracledb.connect(user=self._username,
                                password=self._password,
                                dsn=self._dsn
