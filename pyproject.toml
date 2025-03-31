@@ -38,13 +38,24 @@ dependencies = [
 requires-python = ">=3.10"
 
 [project.optional-dependencies]
+test = [
+  "pytest",
+  "pytest-snapshot",
+  "pytest-mock",
+  "filelock",
+  "dask",
+  "distributed",
+  "pins[gcs]",
+  "docker"
+]
+
 dev = ["bumpver", "pip-tools", "pytest"]
 
 [project.urls]
 Homepage = "https://github.com/gizmodata/oracle-parquet-dumper"
 
 [project.scripts]
-oracle-parquet-dumper = "oracle_parquet_dumper.main:main"
+oracle-parquet-dumper = "oracle_parquet_dumper.main:click_dumper"
 
 [tool.bumpver]
 current_version = "0.0.5"

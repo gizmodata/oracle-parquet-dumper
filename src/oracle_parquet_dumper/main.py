@@ -2,19 +2,16 @@ import logging
 import os
 import shutil
 import sys
-import tempfile
 from contextlib import contextmanager
-from datetime import datetime
 from pathlib import Path
-from textwrap import shorten
 from typing import List, Generator
 
 import click
 import oracledb
-from codetiming import Timer
-from dotenv import load_dotenv
 import pyarrow
 import pyarrow.parquet as pq
+from codetiming import Timer
+from dotenv import load_dotenv
 
 from . import __version__ as app_version
 
@@ -86,10 +83,10 @@ class OracleParquetDumper:
             con.close()
 
     def get_columns(self,
-                   connection: oracledb.Connection,
-                   schema: str,
-                   table_name: str
-                   ):
+                    connection: oracledb.Connection,
+                    schema: str,
+                    table_name: str
+                    ):
         sql = f"""SELECT column_name
                     FROM all_tab_columns
                    WHERE owner = :schema
@@ -164,9 +161,9 @@ class OracleParquetDumper:
 
             if not pq_writer:
                 pq_writer = pq.ParquetWriter(where=file_name,
-                                            schema=pyarrow_table.schema,
-                                            compression=self.compression_method
-                                            )
+                                             schema=pyarrow_table.schema,
+                                             compression=self.compression_method
+                                             )
 
             pq_writer.write_table(table=pyarrow_table)
 
@@ -227,13 +224,15 @@ class OracleParquetDumper:
                                initial_text=True,
                                logger=self.logger.info
                                ):
-                        schema_output_path_prefix = Path(f"{self.output_directory}/{schema.lower() if self.lowercase_object_names else schema}")
+                        schema_output_path_prefix = Path(
+                            f"{self.output_directory}/{schema.lower() if self.lowercase_object_names else schema}")
 
                         table_list = self.get_tables(connection=connection,
-                                                      schema=schema
-                                                      )
+                                                     schema=schema
+                                                     )
                         for table_name in table_list:
-                            table_output_path = Path(f"{schema_output_path_prefix}/{table_name.lower() if self.lowercase_object_names else table_name}")
+                            table_output_path = Path(
+                                f"{schema_output_path_prefix}/{table_name.lower() if self.lowercase_object_names else table_name}")
                             with Timer(name=f"Dumping table: {schema}.{table_name} - to path: {table_output_path}",
                                        text=TIMER_TEXT,
                                        initial_text=True,
@@ -244,6 +243,55 @@ class OracleParquetDumper:
                                                 table_name=table_name,
                                                 output_path_prefix=table_output_path
                                                 )
+
+
+def dumper(version: bool,
+           username: str,
+           password: str,
+           hostname: str,
+           service_name: str,
+           port: int,
+           schema: List[str],
+           table_name_include_pattern: str,
+           table_name_exclude_pattern: str,
+           output_directory: str,
+           overwrite: bool,
+           compression_method: str,
+           batch_size: int,
+           row_limit: int,
+           isolation_level: str,
+           lowercase_object_names: bool,
+           log_level: str):
+    if version:
+        print(f"Oracle Parquet Dumper - version: {app_version}")
+        return
+
+    logger.setLevel(level=getattr(logging, log_level))
+
+    logger.info(msg=f"Starting Oracle Parquet Dumper application - version: {app_version}")
+    arg_dict = locals()
+    arg_dict.update({"password": "(redacted)"})
+    logger.info(msg=f"Called with arguments: {arg_dict}")
+
+    oracle_parquet_dumper = OracleParquetDumper(username=username,
+                                                password=password,
+                                                hostname=hostname,
+                                                service_name=service_name,
+                                                port=port,
+                                                schemas=schema,
+                                                table_name_include_pattern=table_name_include_pattern,
+                                                table_name_exclude_pattern=table_name_exclude_pattern,
+                                                output_directory=output_directory,
+                                                overwrite=overwrite,
+                                                compression_method=compression_method,
+                                                batch_size=batch_size,
+                                                row_limit=row_limit,
+                                                isolation_level=isolation_level,
+                                                lowercase_object_names=lowercase_object_names,
+                                                logger=logger
+                                                )
+
+    oracle_parquet_dumper.dump_tables()
 
 
 @click.command()
@@ -383,55 +431,26 @@ class OracleParquetDumper:
     required=True,
     help="The logging level to use for the application.  Defaults to environment variable: LOGGING_LEVEL if set, otherwise: 'INFO'."
 )
-def main(version: bool,
-         username: str,
-         password: str,
-         hostname: str,
-         service_name: str,
-         port: int,
-         schema: List[str],
-         table_name_include_pattern: str,
-         table_name_exclude_pattern: str,
-         output_directory: str,
-         overwrite: bool,
-         compression_method: str,
-         batch_size: int,
-         row_limit: int,
-         isolation_level: str,
-         lowercase_object_names: bool,
-         log_level: str
-         ):
-    if version:
-        print(f"Oracle Parquet Dumper - version: {app_version}")
-        return
-
-    logger.setLevel(level=getattr(logging, log_level))
-
-    logger.info(msg=f"Starting Oracle Parquet Dumper application - version: {app_version}")
-    arg_dict = locals()
-    arg_dict.update({"password": "(redacted)"})
-    logger.info(msg=f"Called with arguments: {arg_dict}")
-
-    oracle_parquet_dumper = OracleParquetDumper(username=username,
-                                                password=password,
-                                                hostname=hostname,
-                                                service_name=service_name,
-                                                port=port,
-                                                schemas=schema,
-                                                table_name_include_pattern=table_name_include_pattern,
-                                                table_name_exclude_pattern=table_name_exclude_pattern,
-                                                output_directory=output_directory,
-                                                overwrite=overwrite,
-                                                compression_method=compression_method,
-                                                batch_size=batch_size,
-                                                row_limit=row_limit,
-                                                isolation_level=isolation_level,
-                                                lowercase_object_names=lowercase_object_names,
-                                                logger=logger
-                                                )
-
-    oracle_parquet_dumper.dump_tables()
+def click_dumper(version: bool,
+                 username: str,
+                 password: str,
+                 hostname: str,
+                 service_name: str,
+                 port: int,
+                 schema: List[str],
+                 table_name_include_pattern: str,
+                 table_name_exclude_pattern: str,
+                 output_directory: str,
+                 overwrite: bool,
+                 compression_method: str,
+                 batch_size: int,
+                 row_limit: int,
+                 isolation_level: str,
+                 lowercase_object_names: bool,
+                 log_level: str
+                 ):
+    dumper(**locals())
 
 
 if __name__ == "__main__":
-    main()
+    click_dumper()
