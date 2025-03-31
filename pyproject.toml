@@ -1,0 +1,63 @@
+[build-system]
+requires      = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["./src"]  # list of folders that contain the packages (["."] by default)
+include = ["*"]  # package names should match these glob patterns (["*"] by default)
+
+[tool.setuptools.package-data]
+"*" = ["*.yaml"]
+
+[project]
+name = "oracle-parquet-dumper"
+version = "0.0.0"
+description = "A Python-based tool for dumping Oracle database table data to parquet files"
+readme = "README.md"
+authors = [{ name = "Philip Moore", email = "philip@gizmodata.com" }]
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+keywords = ["oracle", "parquet", "dumper", "data", "export", "apache", "arrow"]
+dependencies = [
+    "oracledb==3.0.*",
+    "pyarrow==19.0.*",
+    "click==8.1.*",
+    "codetiming==1.4.*",
+    "munch==4.0.*",
+    "python-dateutil==2.9.*",
+    "pytz==2025.*",
+    "python-dotenv==1.1.*",
+]
+requires-python = ">=3.10"
+
+[project.optional-dependencies]
+dev = ["bumpver", "pip-tools", "pytest"]
+
+[project.urls]
+Homepage = "https://github.com/gizmodata/oracle-parquet-dumper"
+
+[project.scripts]
+oracle-parquet-dumper = "oracle_parquet_dumper.main:main"
+
+[tool.bumpver]
+current_version = "0.0.0"
+version_pattern = "MAJOR.MINOR.PATCH[PYTAGNUM]"
+commit_message = "bump version {old_version} -> {new_version}"
+commit = true
+tag = true
+
+[tool.bumpver.file_patterns]
+"pyproject.toml" = [
+    '^version = "{version}"$',
+    '^current_version = "{version}"$',
+]
+"src/oracle_parquet_dumper/__init__.py" = [
+    '^__version__ = "{version}"$',
+]

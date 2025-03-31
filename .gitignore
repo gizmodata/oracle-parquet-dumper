@@ -1,0 +1,7 @@
+.idea/
+.env
+.venv
+*.egg-info/
+output/
+__pycache__/
+tmp/
