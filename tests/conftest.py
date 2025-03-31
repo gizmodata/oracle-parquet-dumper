@@ -8,9 +8,10 @@ import pytest
 # Constants
 ORACLE_PORT = 1521
 ORACLE_PWD = "aintnobodygottimefordat"
+THIS_DIR = os.path.dirname(__file__)
 
 # Set our path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
+sys.path.insert(0, os.path.abspath(os.path.join(THIS_DIR, "../src")))
 
 
 # Function to wait for a specific log message indicating the container is ready
