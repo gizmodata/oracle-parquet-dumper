@@ -1,8 +1,9 @@
-import sys
 import os
-import pytest
-import docker
+import sys
 import time
+
+import docker
+import pytest
 
 # Constants
 ORACLE_PORT = 1521
@@ -11,8 +12,10 @@ ORACLE_PWD = "aintnobodygottimefordat"
 # Set our path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
 
+
 # Function to wait for a specific log message indicating the container is ready
-def wait_for_container_log(container, timeout=30, poll_interval=1, ready_message="Completed: Pluggable database FREEPDB1 opened read write"):
+def wait_for_container_log(container, timeout=300, poll_interval=1,
+                           ready_message="Completed: Pluggable database FREEPDB1 opened read write"):
     start_time = time.time()
     while time.time() - start_time < timeout:
         # Get the logs from the container
