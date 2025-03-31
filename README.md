@@ -57,18 +57,25 @@ Options:
   --version / --no-version        Prints the Oracle Parquet Dumper utility
                                   version and exits.  [required]
   --username TEXT                 The Oracle database username to connect
-                                  with.  [required]
+                                  with.  Defaults to environment variable:
+                                  DATABASE_USERNAME if set.  [required]
   --password TEXT                 The Oracle database password to connect
-                                  with.  [required]
+                                  with.  Defaults to environment variable:
+                                  DATABASE_PASSWORD if set.  [required]
   --hostname TEXT                 The Oracle database hostname to connect to.
-                                  [required]
+                                  Defaults to environment variable:
+                                  DATABASE_HOSTNAME if set.  [required]
   --service-name TEXT             The Oracle database service name to connect
-                                  to.  [required]
+                                  to.  Defaults to environment variable:
+                                  DATABASE_SERVICE_NAME if set.  [required]
   --port INTEGER                  The Oracle database port to connect to.
-                                  [default: 1521; required]
+                                  Defaults to environment variable:
+                                  DATABASE_PORT if set.  [default: 1521;
+                                  required]
   --schema TEXT                   The schema to export objects for, may be
-                                  specified more than once.  Defaults to the
-                                  database username.  [required]
+                                  specified more than once.  Defaults to
+                                  environment variable: DATABASE_USERNAME if
+                                  set.  [required]
   --table-name-include-pattern TEXT
                                   The regexp pattern to use to filter object
                                   names to include in the export.  [default:
@@ -87,22 +94,30 @@ Options:
                                   parquet files generated.  [default: zstd;
                                   required]
   --batch-size INTEGER            The compression method to use for the
-                                  parquet files generated.  [default: 10000;
+                                  parquet files generated.  Defaults to
+                                  environment variable: BATCH_SIZE if set,
+                                  otherwise: 10000.  [default: 10000;
                                   required]
   --row-limit INTEGER             The maximum number of rows to export from
-                                  each table - useful for testing/debuggin
-                                  purposes.  [default: 0; required]
+                                  each table - useful for testing/debugging
+                                  purposes.  Defaults to -1 - no limit.
+                                  [default: -1; required]
   --isolation-level TEXT          The Oracle session Isolation level - used to
                                   get a consistent export of table data with
                                   regards to System Change Number (SCN).
-                                  [default: SERIALIZABLE; required]
+                                  Defaults to environment variable:
+                                  ISOLATION_LEVEL if set, otherwise:
+                                  'SERIALIZABLE'.  [default: SERIALIZABLE;
+                                  required]
   --lowercase-object-names / --no-lowercase-object-names
                                   Controls whether the dump utility lower-
                                   cases the object names (i.e. schema, table,
                                   and column names).  [default: no-lowercase-
                                   object-names; required]
   --log-level TEXT                The logging level to use for the
-                                  application.  [default: INFO; required]
+                                  application.  Defaults to environment
+                                  variable: LOGGING_LEVEL if set, otherwise:
+                                  'INFO'.  [default: INFO; required]
   --help                          Show this message and exit.
 ```
 

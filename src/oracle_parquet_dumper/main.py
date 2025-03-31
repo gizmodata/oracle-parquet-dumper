@@ -20,6 +20,8 @@ from . import __version__ as app_version
 
 # Constants
 TIMER_TEXT = "{name}: Elapsed time: {:.4f} seconds"
+DEFAULT_PORT: int = 1521
+NO_ROW_LIMIT: int = -1
 
 # Setup logging
 logging.basicConfig(stream=sys.stdout)
@@ -141,7 +143,7 @@ class OracleParquetDumper:
             return
 
         sql = f"SELECT {column_sql} FROM \"{schema}\".\"{table_name}\""
-        if self.row_limit != 0:
+        if self.row_limit != NO_ROW_LIMIT:
             sql += f" FETCH FIRST {self.row_limit} ROWS ONLY"
 
         self.logger.info(msg=f"Dumping table: {schema}.{table_name} - SQL: {sql}")
@@ -169,7 +171,7 @@ class OracleParquetDumper:
             pq_writer.write_table(table=pyarrow_table)
 
         pq_writer.close()
-        self.logger.info(f"Wrote {rows_dumped} rows to {file_name} - table: {schema}.{table_name}")
+        self.logger.info(f"Wrote {rows_dumped:,} row(s) to {file_name} - table: {schema}.{table_name}")
 
     def get_tables(self,
                    connection: oracledb.Connection,
@@ -257,9 +259,9 @@ class OracleParquetDumper:
     "--username",
     type=str,
     default=os.getenv("DATABASE_USERNAME"),
-    show_default=True,
+    show_default=False,
     required=True,
-    help="The Oracle database username to connect with."
+    help="The Oracle database username to connect with.  Defaults to environment variable: DATABASE_USERNAME if set."
 )
 @click.option(
     "--password",
@@ -267,40 +269,40 @@ class OracleParquetDumper:
     default=os.getenv("DATABASE_PASSWORD"),
     show_default=False,
     required=True,
-    help="The Oracle database password to connect with."
+    help="The Oracle database password to connect with.  Defaults to environment variable: DATABASE_PASSWORD if set."
 )
 @click.option(
     "--hostname",
     type=str,
     default=os.getenv("DATABASE_HOSTNAME"),
-    show_default=True,
+    show_default=False,
     required=True,
-    help="The Oracle database hostname to connect to."
+    help="The Oracle database hostname to connect to.  Defaults to environment variable: DATABASE_HOSTNAME if set."
 )
 @click.option(
     "--service-name",
     type=str,
     default=os.getenv("DATABASE_SERVICE_NAME"),
-    show_default=True,
+    show_default=False,
     required=True,
-    help="The Oracle database service name to connect to."
+    help="The Oracle database service name to connect to.  Defaults to environment variable: DATABASE_SERVICE_NAME if set."
 )
 @click.option(
     "--port",
     type=int,
-    default=os.getenv("DATABASE_PORT"),
+    default=os.getenv("DATABASE_PORT", DEFAULT_PORT),
     show_default=True,
     required=True,
-    help="The Oracle database port to connect to."
+    help="The Oracle database port to connect to.  Defaults to environment variable: DATABASE_PORT if set."
 )
 @click.option(
     "--schema",
     type=str,
     default=[os.getenv("DATABASE_USERNAME", "").upper()],
-    show_default=True,
+    show_default=False,
     required=True,
     multiple=True,
-    help="The schema to export objects for, may be specified more than once.  Defaults to the database username."
+    help="The schema to export objects for, may be specified more than once.  Defaults to environment variable: DATABASE_USERNAME if set."
 )
 @click.option(
     "--table-name-include-pattern",
@@ -347,15 +349,15 @@ class OracleParquetDumper:
     default=int(os.getenv("BATCH_SIZE", 10_000)),
     show_default=True,
     required=True,
-    help="The compression method to use for the parquet files generated."
+    help="The compression method to use for the parquet files generated.  Defaults to environment variable: BATCH_SIZE if set, otherwise: 10000."
 )
 @click.option(
     "--row-limit",
     type=int,
-    default=int(os.getenv("ROW_LIMIT", "0")),
+    default=int(os.getenv("ROW_LIMIT", NO_ROW_LIMIT)),
     show_default=True,
     required=True,
-    help="The maximum number of rows to export from each table - useful for testing/debuggin purposes."
+    help=f"The maximum number of rows to export from each table - useful for testing/debugging purposes.  Defaults to {NO_ROW_LIMIT} - no limit."
 )
 @click.option(
     "--isolation-level",
@@ -363,7 +365,7 @@ class OracleParquetDumper:
     default=os.getenv("ISOLATION_LEVEL", "SERIALIZABLE"),
     show_default=True,
     required=True,
-    help="The Oracle session Isolation level - used to get a consistent export of table data with regards to System Change Number (SCN)."
+    help="The Oracle session Isolation level - used to get a consistent export of table data with regards to System Change Number (SCN).  Defaults to environment variable: ISOLATION_LEVEL if set, otherwise: 'SERIALIZABLE'."
 )
 @click.option(
     "--lowercase-object-names/--no-lowercase-object-names",
@@ -379,7 +381,7 @@ class OracleParquetDumper:
     default=os.getenv("LOGGING_LEVEL", "INFO"),
     show_default=True,
     required=True,
-    help="The logging level to use for the application."
+    help="The logging level to use for the application.  Defaults to environment variable: LOGGING_LEVEL if set, otherwise: 'INFO'."
 )
 def main(version: bool,
          username: str,
