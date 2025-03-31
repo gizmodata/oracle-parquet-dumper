@@ -6,7 +6,7 @@
 [![PyPI version](https://badge.fury.io/py/oracle-parquet-dumper.svg)](https://badge.fury.io/py/oracle-parquet-dumper)
 [![PyPI Downloads](https://img.shields.io/pypi/dm/oracle-parquet-dumper.svg)](https://pypi.org/project/oracle-parquet-dumper/)
 
-The Oracle Parquet Dumper utility is a command-line tool that allows you to export Oracle database objects (tables, views, etc.) to Parquet files. It can be used in conjunction with the [GizmoSQL](https://gizmodata.com/gizmosql) database engine to hyper-accelerate Oracle SQL workloads.
+The Oracle Parquet Dumper utility is a command-line tool that allows you to export Oracle database table data to Parquet files. It can be used in conjunction with the [GizmoSQL](https://gizmodata.com/gizmosql) database engine to hyper-accelerate Oracle SQL workloads.
 
 ## Install package
 You can install `oracle-parquet-dumper` from source.
