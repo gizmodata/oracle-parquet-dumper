@@ -1,4 +1,4 @@
-# [GizmoData](https://gizmodata.com)™ - Oracle Parquet Dumper
+# Oracle Parquet Dumper - by [GizmoData](https://gizmodata.com)™
 
 [<img src="https://img.shields.io/badge/GitHub-gizmodata%2Foracle--parquet--dumper-blue.svg?logo=Github">](https://github.com/gizmodata/oracle-parquet-dumper)
 [![oracle-parquet-dumper-ci](https://github.com/gizmodata/oracle-parquet-dumper/actions/workflows/ci.yml/badge.svg)](https://github.com/gizmodata/oracle-parquet-dumper/actions/workflows/ci.yml)
