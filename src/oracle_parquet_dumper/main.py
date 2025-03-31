@@ -123,7 +123,7 @@ class OracleParquetDumper:
             else:
                 column_sql += f", \"{column_name}\""
 
-        return column_sql
+        return column_sql.strip(", ")
 
     def dump_table(self,
                    connection: oracledb.Connection,
@@ -140,7 +140,7 @@ class OracleParquetDumper:
             self.logger.warning(f"Table: {schema}.{table_name} has no eligible dump columns, skipping.")
             return
 
-        sql = f"SELECT {column_sql.strip(", ")} FROM \"{schema}\".\"{table_name}\""
+        sql = f"SELECT {column_sql} FROM \"{schema}\".\"{table_name}\""
         if self.row_limit != 0:
             sql += f" FETCH FIRST {self.row_limit} ROWS ONLY"
 

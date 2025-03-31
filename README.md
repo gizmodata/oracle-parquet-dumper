@@ -1,13 +1,15 @@
-# Oracle Object Tracker
+# Oracle Parquet Dumper
 
-[<img src="https://img.shields.io/badge/GitHub-TruckCab%2Foracle--object--tracker-blue.svg?logo=Github">](https://github.com/TruckCab/oracle-object-tracker)
-[![oracle-object-tracker-ci](https://github.com/TruckCab/oracle-object-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/TruckCab/oracle-object-tracker/actions/workflows/ci.yml)
+[<img src="https://img.shields.io/badge/GitHub-gizmodata%2Foracle--parquet--dumper-blue.svg?logo=Github">](https://github.com/gizmodata/oracle-parquet-dumper)
+[![oracle-parquet-dumper-ci](https://github.com/gizmodata/oracle-parquet-dumper/actions/workflows/ci.yml/badge.svg)](https://github.com/gizmodata/oracle-parquet-dumper/actions/workflows/ci.yml)
 [![Supported Python Versions](https://img.shields.io/pypi/pyversions/sidewinder-db)](https://pypi.org/project/sidewinder-db/)
-[![PyPI version](https://badge.fury.io/py/oracle-object-tracker.svg)](https://badge.fury.io/py/oracle-object-tracker)
-[![PyPI Downloads](https://img.shields.io/pypi/dm/oracle-object-tracker.svg)](https://pypi.org/project/oracle-object-tracker/)
+[![PyPI version](https://badge.fury.io/py/oracle-parquet-dumper.svg)](https://badge.fury.io/py/oracle-parquet-dumper)
+[![PyPI Downloads](https://img.shields.io/pypi/dm/oracle-parquet-dumper.svg)](https://pypi.org/project/oracle-parquet-dumper/)
+
+The Oracle Parquet Dumper utility is a command-line tool that allows you to export Oracle database objects (tables, views, etc.) to Parquet files. It can be used in conjunction with the [GizmoSQL](https://gizmodata.com/gizmosql) database engine to hyper-accelerate Oracle SQL workloads.
 
 ## Install package
-You can install `oracle-object-tracker` from source.
+You can install `oracle-parquet-dumper` from source.
 
 ### Option 1 - from PyPi
 ```shell
@@ -17,14 +19,14 @@ python3 -m venv .venv
 # Activate the virtual environment
 . .venv/bin/activate
 
-pip install oracle-object-tracker
+pip install oracle-parquet-dumper
 ```
 
 ### Option 2 - from source - for development
 ```shell
-git clone https://github.com/TruckCab/oracle-object-tracker.git
+git clone https://github.com/gizmodata/oracle-parquet-dumper.git
 
-cd oracle-object-tracker
+cd oracle-parquet-dumper
 
 # Create the virtual environment
 python3 -m venv .venv
@@ -48,56 +50,60 @@ export PYTHONPATH=$(pwd)/src
 ## Usage
 ### Help
 ```shell
-oracle-object-tracker --help
-Usage: oracle-object-tracker [OPTIONS]
+oracle-parquet-dumper --help
+Usage: oracle-parquet-dumper [OPTIONS]
 
 Options:
-  --version / --no-version        Prints the Oracle Object Tracker version and
-                                  exits.  [required]
+  --version / --no-version        Prints the Oracle Parquet Dumper utility
+                                  version and exits.  [required]
   --username TEXT                 The Oracle database username to connect
-                                  with.  [required]
+                                  with.  [default: truck_cab; required]
   --password TEXT                 The Oracle database password to connect
                                   with.  [required]
   --hostname TEXT                 The Oracle database hostname to connect to.
-                                  [required]
+                                  [default: oracle.truckcab.us; required]
   --service-name TEXT             The Oracle database service name to connect
-                                  to.  [required]
+                                  to.  [default:
+                                  tcmpdb.sub10220134280.tcmvcn1.oraclevcn.com;
+                                  required]
   --port INTEGER                  The Oracle database port to connect to.
-                                  [required]
+                                  [default: 1521; required]
   --schema TEXT                   The schema to export objects for, may be
                                   specified more than once.  Defaults to the
-                                  database username.  [required]
-  --object-type TEXT              The object types to export.  [default:
-                                  CLUSTER, DATABASE LINK, FUNCTION, INDEX,
-                                  JAVA SOURCE, JOB, MATERIALIZED VIEW,
-                                  MATERIALIZED VIEW LOG, PACKAGE, PACKAGE
-                                  BODY, PROCEDURE, SEQUENCE, SYNONYM, TABLE,
-                                  TRIGGER, TYPE, TYPE BODY, VIEW; required]
-  --object-name-include-pattern TEXT
+                                  database username.  [default: TRUCK_CAB;
+                                  required]
+  --table-name-include-pattern TEXT
                                   The regexp pattern to use to filter object
                                   names to include in the export.  [default:
                                   .*; required]
-  --object-name-exclude-pattern TEXT
+  --table-name-exclude-pattern TEXT
                                   The regexp pattern to use to filter object
                                   names to exclude in the export.
   --output-directory TEXT         The path to the output directory - may be
-                                  relative or absolute.  [default: /var/folder
-                                  s/c8/b5pj7nzx627_9tbw374v3r1h0000gn/T/output
-                                  ; required]
-  --overwrite BOOLEAN             Controls whether to overwrite any existing
+                                  relative or absolute.  [default: output;
+                                  required]
+  --overwrite / --no-overwrite    Controls whether to overwrite any existing
                                   DDL export files in the output path.
-                                  [default: False; required]
-  --git-repo TEXT                 Allows you to specify a git repository to
-                                  push the output files to.  The repository
-                                  must be accessible via SSH. Example:
-                                  git@github.com:some-org/some-repo.git See: h
-                                  ttps://docs.github.com/en/authentication/con
-                                  necting-to-github-with-ssh/adding-a-new-ssh-
-                                  key-to-your-github-account for more
-                                  information on setting up SSH keys for
-                                  GitHub.
-  --git-branch TEXT               Specify the git branch to push to - if the
-                                  --git-repo arg is used.  [default: main]
+                                  [default: no-overwrite; required]
+  --compression-method [none|snappy|gzip|zstd]
+                                  The compression method to use for the
+                                  parquet files generated.  [default: zstd;
+                                  required]
+  --batch-size INTEGER            The compression method to use for the
+                                  parquet files generated.  [default: 10000;
+                                  required]
+  --row-limit INTEGER             The maximum number of rows to export from
+                                  each table - useful for testing/debuggin
+                                  purposes.  [default: 0; required]
+  --isolation-level TEXT          The Oracle session Isolation level - used to
+                                  get a consistent export of table data with
+                                  regards to System Change Number (SCN).
+                                  [default: SERIALIZABLE; required]
+  --lowercase-object-names / --no-lowercase-object-names
+                                  Controls whether the dump utility lower-
+                                  cases the object names (i.e. schema, table,
+                                  and column names).  [default: no-lowercase-
+                                  object-names; required]
   --log-level TEXT                The logging level to use for the
                                   application.  [default: INFO; required]
   --help                          Show this message and exit.
