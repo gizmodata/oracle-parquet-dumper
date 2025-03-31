@@ -1,4 +1,4 @@
-name: oracle-object-tracker-ci
+name: oracle-parquet-dumper-ci
 
 on:
   workflow_dispatch:
