@@ -268,7 +268,7 @@ def dumper(version: bool,
 
     logger.setLevel(level=getattr(logging, log_level))
 
-    logger.info(msg=f"Starting Oracle Parquet Dumper application - version: {app_version}")
+    logger.info(msg=f"Starting GizmoData™ Oracle Parquet Dumper application - version: {app_version}")
     arg_dict = locals()
     arg_dict.update({"password": "(redacted)"})
     logger.info(msg=f"Called with arguments: {arg_dict}")
