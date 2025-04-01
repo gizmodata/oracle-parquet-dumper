@@ -6,7 +6,9 @@
 [![PyPI version](https://badge.fury.io/py/oracle-parquet-dumper.svg)](https://badge.fury.io/py/oracle-parquet-dumper)
 [![PyPI Downloads](https://img.shields.io/pypi/dm/oracle-parquet-dumper.svg)](https://pypi.org/project/oracle-parquet-dumper/)
 
-The [GizmoData](https://gizmodata.com)™ Oracle Parquet Dumper utility is a command-line tool that allows you to export Oracle database table data to Parquet files. It can be used in conjunction with the [GizmoSQL](https://gizmodata.com/gizmosql) database engine to hyper-accelerate Oracle SQL workloads.
+The [GizmoData](https://gizmodata.com)™ Oracle Parquet Dumper utility is a command-line tool that allows you to export Oracle database table data to Parquet files. It can be used in conjunction with the [GizmoSQL](https://gizmodata.com/gizmosql) database engine to hyper-accelerate Oracle SQL analytical (OLAP) workloads at reduced cost.
+
+This package uses the Python "[oracledb](https://pypi.org/project/oracledb/)" package to connect to Oracle databases, and the [pyarrow](https://pypi.org/project/pyarrow/) package to write Parquet files.
 
 ## Install package
 You can install `oracle-parquet-dumper` from source.
@@ -114,6 +116,19 @@ Options:
                                   cases the object names (i.e. schema, table,
                                   and column names).  [default: no-lowercase-
                                   object-names; required]
+  --parquet-max-file-size INTEGER
+                                  The maximum file size for the parquet files
+                                  generated.  Defaults to environment
+                                  variable: PARQUET_MAX_FILE_SIZE if set,
+                                  otherwise: 200,000,000.  Note: this is not
+                                  the maximum size of the parquet file, but
+                                  the maximum size of the file on disk.  The
+                                  actual parquet file may be larger due to
+                                  compression.  The file size is determined by
+                                  the number of rows in the table and the
+                                  batch size.  The file size is not guaranteed
+                                  to be less than this value, but it will be
+                                  close.  [default: 200000000; required]
   --log-level TEXT                The logging level to use for the
                                   application.  Defaults to environment
                                   variable: LOGGING_LEVEL if set, otherwise:

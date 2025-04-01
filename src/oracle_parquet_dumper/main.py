@@ -19,6 +19,7 @@ from . import __version__ as app_version
 TIMER_TEXT = "{name}: Elapsed time: {:.4f} seconds"
 DEFAULT_PORT: int = 1521
 NO_ROW_LIMIT: int = -1
+DEFAULT_PARQUET_MAX_FILE_SIZE: int = 200_000_000  # 200MB
 
 # Setup logging
 logging.basicConfig(stream=sys.stdout)
@@ -45,6 +46,7 @@ class OracleParquetDumper:
                  row_limit: int,
                  isolation_level: str,
                  lowercase_object_names: bool,
+                 parquet_max_file_size: int,
                  logger: logging.Logger
                  ):
         self._username = username
@@ -64,6 +66,7 @@ class OracleParquetDumper:
         self.row_limit = row_limit
         self.isolation_level = isolation_level
         self.lowercase_object_names = lowercase_object_names
+        self.parquet_max_file_size = parquet_max_file_size
         self.logger = logger
 
         try:
@@ -149,7 +152,8 @@ class OracleParquetDumper:
         rows_dumped = 0
 
         Path(output_path_prefix).mkdir(parents=True, exist_ok=True)
-        file_name = f"{output_path_prefix}/{table_name.lower() if self.lowercase_object_names else table_name}.parquet"
+        file_number = 0
+        file_size = 0
         for odf in connection.fetch_df_batches(statement=sql,
                                                size=self.batch_size
                                                ):
@@ -160,6 +164,7 @@ class OracleParquetDumper:
             rows_dumped += pyarrow_table.num_rows
 
             if not pq_writer:
+                file_name = f"{output_path_prefix}/{table_name.lower() if self.lowercase_object_names else table_name}_{file_number}.parquet"
                 pq_writer = pq.ParquetWriter(where=file_name,
                                              schema=pyarrow_table.schema,
                                              compression=self.compression_method
@@ -167,8 +172,22 @@ class OracleParquetDumper:
 
             pq_writer.write_table(table=pyarrow_table)
 
-        pq_writer.close()
-        self.logger.info(f"Wrote {rows_dumped:,} row(s) to {file_name} - table: {schema}.{table_name}")
+            # Get the file size of the current parquet file
+            file_size += pyarrow_table.nbytes
+
+            if file_size >= self.parquet_max_file_size:
+                if pq_writer:
+                    if pq_writer.is_open:
+                        pq_writer.close()
+                    file_size = 0
+                    file_number += 1
+                    pq_writer = None
+
+        if pq_writer:
+            if pq_writer.is_open:
+                pq_writer.close()
+
+        self.logger.info(f"Wrote {rows_dumped:,} row(s) to {output_path_prefix} - table: {schema}.{table_name}")
 
     def get_tables(self,
                    connection: oracledb.Connection,
@@ -261,6 +280,7 @@ def dumper(version: bool,
            row_limit: int,
            isolation_level: str,
            lowercase_object_names: bool,
+           parquet_max_file_size: int,
            log_level: str):
     if version:
         print(f"Oracle Parquet Dumper - version: {app_version}")
@@ -288,6 +308,7 @@ def dumper(version: bool,
                                                 row_limit=row_limit,
                                                 isolation_level=isolation_level,
                                                 lowercase_object_names=lowercase_object_names,
+                                                parquet_max_file_size=parquet_max_file_size,
                                                 logger=logger
                                                 )
 
@@ -424,6 +445,16 @@ def dumper(version: bool,
     help="Controls whether the dump utility lower-cases the object names (i.e. schema, table, and column names)."
 )
 @click.option(
+    "--parquet-max-file-size",
+    type=int,
+    default=os.getenv("PARQUET_MAX_FILE_SIZE", DEFAULT_PARQUET_MAX_FILE_SIZE),
+    show_default=True,
+    required=True,
+    help=f"The maximum file size for the parquet files generated.  Defaults to environment variable: PARQUET_MAX_FILE_SIZE if set, otherwise: {DEFAULT_PARQUET_MAX_FILE_SIZE:,}."
+    "  Note: this is not the maximum size of the parquet file, but the maximum size of the file on disk.  The actual parquet file may be larger due to compression."
+    "  The file size is determined by the number of rows in the table and the batch size.  The file size is not guaranteed to be less than this value, but it will be close."
+)
+@click.option(
     "--log-level",
     type=str,
     default=os.getenv("LOGGING_LEVEL", "INFO"),
@@ -447,6 +478,7 @@ def click_dumper(version: bool,
                  row_limit: int,
                  isolation_level: str,
                  lowercase_object_names: bool,
+                 parquet_max_file_size: int,
                  log_level: str
                  ):
     dumper(**locals())

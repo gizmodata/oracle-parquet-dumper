@@ -27,11 +27,12 @@ def test_basics(oracle_server):
                row_limit=-1,
                isolation_level="SERIALIZABLE",
                lowercase_object_names=False,
+               parquet_max_file_size=1_000_000_000,
                log_level="INFO"
                )
 
         # Check if the parquet file is created
-        parquet_file_path = f"{tmpdir}/{schema_name}/{table_name}/{table_name}.parquet"
+        parquet_file_path = f"{tmpdir}/{schema_name}/{table_name}/{table_name}_0.parquet"
 
         # Read the parquet file and print out a dataframe
         table = pq.read_table(parquet_file_path)
