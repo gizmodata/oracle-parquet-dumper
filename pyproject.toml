@@ -13,9 +13,9 @@ include = ["*"]  # package names should match these glob patterns (["*"] by defa
 "*" = ["*.yaml"]
 
 [project]
-name = "oracle-parquet-dumper"
+name = "oracle-parquet-exporter"
 version = "0.0.15"
-description = "A Python-based tool for dumping Oracle database table data to parquet files"
+description = "A Python-based tool for exporting Oracle database table data to parquet files"
 readme = "README.md"
 authors = [{ name = "Philip Moore", email = "philip@gizmodata.com" }]
 license = { file = "LICENSE" }
@@ -24,11 +24,11 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
 ]
-keywords = ["oracle", "parquet", "dumper", "data", "export", "apache", "arrow"]
+keywords = ["oracle", "parquet", "exporter", "data", "export", "apache", "arrow"]
 dependencies = [
-    "oracledb==3.0.*",
-    "pyarrow==19.0.*",
-    "click==8.1.*",
+    "oracledb==3.1.*",
+    "pyarrow==20.0.*",
+    "click==8.2.*",
     "codetiming==1.4.*",
     "munch==4.0.*",
     "python-dateutil==2.9.*",
@@ -52,10 +52,10 @@ test = [
 dev = ["bumpver", "pip-tools", "pytest"]
 
 [project.urls]
-Homepage = "https://github.com/gizmodata/oracle-parquet-dumper"
+Homepage = "https://github.com/gizmodata/oracle-parquet-exporter"
 
 [project.scripts]
-oracle-parquet-dumper = "oracle_parquet_dumper.main:click_dumper"
+oracle-parquet-exporter = "oracle_parquet_exporter.main:click_exporter"
 
 [tool.bumpver]
 current_version = "0.0.15"
@@ -69,6 +69,6 @@ tag = true
     '^version = "{version}"$',
     '^current_version = "{version}"$',
 ]
-"src/oracle_parquet_dumper/__init__.py" = [
+"src/oracle_parquet_exporter/__init__.py" = [
     '^__version__ = "{version}"$',
 ]
