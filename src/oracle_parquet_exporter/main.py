@@ -29,7 +29,7 @@ logger = logging.getLogger()
 load_dotenv(dotenv_path=".env")
 
 
-class OracleParquetDumper:
+class OracleParquetExporter:
     def __init__(self,
                  username: str,
                  password: str,
@@ -264,55 +264,55 @@ class OracleParquetDumper:
                                                 )
 
 
-def dumper(version: bool,
-           username: str,
-           password: str,
-           hostname: str,
-           service_name: str,
-           port: int,
-           schema: List[str],
-           table_name_include_pattern: str,
-           table_name_exclude_pattern: str,
-           output_directory: str,
-           overwrite: bool,
-           compression_method: str,
-           batch_size: int,
-           row_limit: int,
-           isolation_level: str,
-           lowercase_object_names: bool,
-           parquet_max_file_size: int,
-           log_level: str):
+def exporter(version: bool,
+             username: str,
+             password: str,
+             hostname: str,
+             service_name: str,
+             port: int,
+             schema: List[str],
+             table_name_include_pattern: str,
+             table_name_exclude_pattern: str,
+             output_directory: str,
+             overwrite: bool,
+             compression_method: str,
+             batch_size: int,
+             row_limit: int,
+             isolation_level: str,
+             lowercase_object_names: bool,
+             parquet_max_file_size: int,
+             log_level: str):
     if version:
-        print(f"Oracle Parquet Dumper - version: {app_version}")
+        print(f"Oracle Parquet Exporter - version: {app_version}")
         return
 
     logger.setLevel(level=getattr(logging, log_level))
 
-    logger.info(msg=f"Starting GizmoData™ Oracle Parquet Dumper application - version: {app_version}")
+    logger.info(msg=f"Starting GizmoData™ Oracle Parquet Exporter application - version: {app_version}")
     arg_dict = locals()
     arg_dict.update({"password": "(redacted)"})
     logger.info(msg=f"Called with arguments: {arg_dict}")
 
-    oracle_parquet_dumper = OracleParquetDumper(username=username,
-                                                password=password,
-                                                hostname=hostname,
-                                                service_name=service_name,
-                                                port=port,
-                                                schemas=schema,
-                                                table_name_include_pattern=table_name_include_pattern,
-                                                table_name_exclude_pattern=table_name_exclude_pattern,
-                                                output_directory=output_directory,
-                                                overwrite=overwrite,
-                                                compression_method=compression_method,
-                                                batch_size=batch_size,
-                                                row_limit=row_limit,
-                                                isolation_level=isolation_level,
-                                                lowercase_object_names=lowercase_object_names,
-                                                parquet_max_file_size=parquet_max_file_size,
-                                                logger=logger
-                                                )
+    oracle_parquet_exporter = OracleParquetExporter(username=username,
+                                                    password=password,
+                                                    hostname=hostname,
+                                                    service_name=service_name,
+                                                    port=port,
+                                                    schemas=schema,
+                                                    table_name_include_pattern=table_name_include_pattern,
+                                                    table_name_exclude_pattern=table_name_exclude_pattern,
+                                                    output_directory=output_directory,
+                                                    overwrite=overwrite,
+                                                    compression_method=compression_method,
+                                                    batch_size=batch_size,
+                                                    row_limit=row_limit,
+                                                    isolation_level=isolation_level,
+                                                    lowercase_object_names=lowercase_object_names,
+                                                    parquet_max_file_size=parquet_max_file_size,
+                                                    logger=logger
+                                                    )
 
-    oracle_parquet_dumper.dump_tables()
+    oracle_parquet_exporter.dump_tables()
 
 
 @click.command()
@@ -322,7 +322,7 @@ def dumper(version: bool,
     default=False,
     show_default=False,
     required=True,
-    help="Prints the Oracle Parquet Dumper utility version and exits."
+    help="Prints the Oracle Parquet Exporter utility version and exits."
 )
 @click.option(
     "--username",
@@ -430,11 +430,11 @@ def dumper(version: bool,
 )
 @click.option(
     "--isolation-level",
-    type=str,
+    type=click.Choice(["SERIALIZABLE", "READ COMMITTED"]),
     default=os.getenv("ISOLATION_LEVEL", "SERIALIZABLE"),
     show_default=True,
     required=True,
-    help="The Oracle session Isolation level - used to get a consistent export of table data with regards to System Change Number (SCN).  Defaults to environment variable: ISOLATION_LEVEL if set, otherwise: 'SERIALIZABLE'."
+    help="The Oracle session Isolation level - used to get a consistent export of table data with regards to System Change Number (SCN).  Defaults to environment variable: ISOLATION_LEVEL if set, otherwise: 'SERIALIZABLE' (to ensure better referential integrity)."
 )
 @click.option(
     "--lowercase-object-names/--no-lowercase-object-names",
@@ -451,8 +451,8 @@ def dumper(version: bool,
     show_default=True,
     required=True,
     help=f"The maximum file size for the parquet files generated.  Defaults to environment variable: PARQUET_MAX_FILE_SIZE if set, otherwise: {DEFAULT_PARQUET_MAX_FILE_SIZE:,}."
-    "  Note: this is not the maximum size of the parquet file, but the maximum size of the file on disk.  The actual parquet file may be larger due to compression."
-    "  The file size is determined by the number of rows in the table and the batch size.  The file size is not guaranteed to be less than this value, but it will be close."
+         "  Note: this is not the maximum size of the parquet file, but the maximum size of the file on disk.  The actual parquet file may be larger due to compression."
+         "  The file size is determined by the number of rows in the table and the batch size.  The file size is not guaranteed to be less than this value, but it will be close."
 )
 @click.option(
     "--log-level",
@@ -462,27 +462,27 @@ def dumper(version: bool,
     required=True,
     help="The logging level to use for the application.  Defaults to environment variable: LOGGING_LEVEL if set, otherwise: 'INFO'."
 )
-def click_dumper(version: bool,
-                 username: str,
-                 password: str,
-                 hostname: str,
-                 service_name: str,
-                 port: int,
-                 schema: List[str],
-                 table_name_include_pattern: str,
-                 table_name_exclude_pattern: str,
-                 output_directory: str,
-                 overwrite: bool,
-                 compression_method: str,
-                 batch_size: int,
-                 row_limit: int,
-                 isolation_level: str,
-                 lowercase_object_names: bool,
-                 parquet_max_file_size: int,
-                 log_level: str
-                 ):
-    dumper(**locals())
+def click_exporter(version: bool,
+                   username: str,
+                   password: str,
+                   hostname: str,
+                   service_name: str,
+                   port: int,
+                   schema: List[str],
+                   table_name_include_pattern: str,
+                   table_name_exclude_pattern: str,
+                   output_directory: str,
+                   overwrite: bool,
+                   compression_method: str,
+                   batch_size: int,
+                   row_limit: int,
+                   isolation_level: str,
+                   lowercase_object_names: bool,
+                   parquet_max_file_size: int,
+                   log_level: str
+                   ):
+    exporter(**locals())
 
 
 if __name__ == "__main__":
-    click_dumper()
+    click_exporter()

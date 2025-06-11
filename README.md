@@ -1,17 +1,17 @@
-# Oracle Parquet Dumper - by [GizmoData](https://gizmodata.com)™
+# Oracle Parquet Exporter - by [GizmoData](https://gizmodata.com)™
 
-[<img src="https://img.shields.io/badge/GitHub-gizmodata%2Foracle--parquet--dumper-blue.svg?logo=Github">](https://github.com/gizmodata/oracle-parquet-dumper)
-[![oracle-parquet-dumper-ci](https://github.com/gizmodata/oracle-parquet-dumper/actions/workflows/ci.yml/badge.svg)](https://github.com/gizmodata/oracle-parquet-dumper/actions/workflows/ci.yml)
-[![Supported Python Versions](https://img.shields.io/pypi/pyversions/oracle-parquet-dumper)](https://pypi.org/project/oracle-parquet-dumper/)
-[![PyPI version](https://badge.fury.io/py/oracle-parquet-dumper.svg)](https://badge.fury.io/py/oracle-parquet-dumper)
-[![PyPI Downloads](https://img.shields.io/pypi/dm/oracle-parquet-dumper.svg)](https://pypi.org/project/oracle-parquet-dumper/)
+[<img src="https://img.shields.io/badge/GitHub-gizmodata%2Foracle--parquet--exporter-blue.svg?logo=Github">](https://github.com/gizmodata/oracle-parquet-exporter)
+[![oracle-parquet-exporter-ci](https://github.com/gizmodata/oracle-parquet-exporter/actions/workflows/ci.yml/badge.svg)](https://github.com/gizmodata/oracle-parquet-exporter/actions/workflows/ci.yml)
+[![Supported Python Versions](https://img.shields.io/pypi/pyversions/oracle-parquet-exporter)](https://pypi.org/project/oracle-parquet-exporter/)
+[![PyPI version](https://badge.fury.io/py/oracle-parquet-exporter.svg)](https://badge.fury.io/py/oracle-parquet-exporter)
+[![PyPI Downloads](https://img.shields.io/pypi/dm/oracle-parquet-exporter.svg)](https://pypi.org/project/oracle-parquet-exporter/)
 
-The [GizmoData](https://gizmodata.com)™ Oracle Parquet Dumper utility is a command-line tool that allows you to export Oracle database table data to Parquet files. It can be used in conjunction with the [GizmoSQL](https://gizmodata.com/gizmosql) database engine to hyper-accelerate Oracle SQL analytical (OLAP) workloads at reduced cost.
+The [GizmoData](https://gizmodata.com)™ Oracle Parquet Exporter utility is a command-line tool that allows you to export Oracle database table data to Parquet files. It can be used in conjunction with the [GizmoSQL](https://gizmodata.com/gizmosql) database engine to hyper-accelerate Oracle SQL analytical (OLAP) workloads at reduced cost.
 
 This package uses the Python "[oracledb](https://pypi.org/project/oracledb/)" package to connect to Oracle databases, and the [pyarrow](https://pypi.org/project/pyarrow/) package to write Parquet files.
 
 ## Install package
-You can install `oracle-parquet-dumper` from source.
+You can install `oracle-parquet-exporter` from source.
 
 ### Option 1 - from PyPi
 ```shell
@@ -21,14 +21,14 @@ python3 -m venv .venv
 # Activate the virtual environment
 . .venv/bin/activate
 
-pip install oracle-parquet-dumper
+pip install oracle-parquet-exporter
 ```
 
 ### Option 2 - from source - for development
 ```shell
-git clone https://github.com/gizmodata/oracle-parquet-dumper.git
+git clone https://github.com/gizmodata/oracle-parquet-exporter.git
 
-cd oracle-parquet-dumper
+cd oracle-parquet-exporter
 
 # Create the virtual environment
 python3 -m venv .venv
@@ -39,7 +39,7 @@ python3 -m venv .venv
 # Upgrade pip, setuptools, and wheel
 pip install --upgrade pip setuptools wheel
 
-# Install Oracle Parquet Dumper in editable mode with dev dependencies
+# Install Oracle Parquet Exporter in editable mode with dev dependencies
 pip install --editable .[dev]
 ```
 
@@ -52,11 +52,11 @@ export PYTHONPATH=$(pwd)/src
 ## Usage
 ### Help
 ```shell
-oracle-parquet-dumper --help
-Usage: oracle-parquet-dumper [OPTIONS]
+oracle-parquet-exporter --help
+Usage: oracle-parquet-exporter [OPTIONS]
 
 Options:
-  --version / --no-version        Prints the Oracle Parquet Dumper utility
+  --version / --no-version        Prints the Oracle Parquet Exporter utility
                                   version and exits.  [required]
   --username TEXT                 The Oracle database username to connect
                                   with.  Defaults to environment variable:
@@ -104,12 +104,14 @@ Options:
                                   each table - useful for testing/debugging
                                   purposes.  Defaults to -1 - no limit.
                                   [default: -1; required]
-  --isolation-level TEXT          The Oracle session Isolation level - used to
+  --isolation-level [SERIALIZABLE|READ COMMITTED]
+                                  The Oracle session Isolation level - used to
                                   get a consistent export of table data with
                                   regards to System Change Number (SCN).
                                   Defaults to environment variable:
                                   ISOLATION_LEVEL if set, otherwise:
-                                  'SERIALIZABLE'.  [default: SERIALIZABLE;
+                                  'SERIALIZABLE' (to ensure better referential
+                                  integrity).  [default: SERIALIZABLE;
                                   required]
   --lowercase-object-names / --no-lowercase-object-names
                                   Controls whether the dump utility lower-

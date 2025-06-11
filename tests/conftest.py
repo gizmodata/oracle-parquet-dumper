@@ -37,7 +37,7 @@ def oracle_server():
     client = docker.from_env()
     container = client.containers.run(
         image="container-registry.oracle.com/database/free:latest-lite",
-        name="oracle-parquet-dumper-test",
+        name="oracle-parquet-exporter-test",
         detach=True,
         remove=True,
         tty=True,

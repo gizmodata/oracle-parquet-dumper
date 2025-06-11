@@ -1,4 +1,4 @@
-name: oracle-parquet-dumper-ci
+name: oracle-parquet-exporter-ci
 
 on:
   workflow_dispatch:
