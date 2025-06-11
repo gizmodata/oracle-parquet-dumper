@@ -1,17 +1,16 @@
-import logging
-import os
-import shutil
-import sys
-from contextlib import contextmanager
-from pathlib import Path
-from typing import List, Generator
-
 import click
+import logging
 import oracledb
+import os
 import pyarrow
 import pyarrow.parquet as pq
+import shutil
+import sys
 from codetiming import Timer
+from contextlib import contextmanager
 from dotenv import load_dotenv
+from pathlib import Path
+from typing import List, Generator
 
 from . import __version__ as app_version
 
@@ -127,29 +126,29 @@ class OracleParquetExporter:
 
         return column_sql.strip(", ")
 
-    def dump_table(self,
-                   connection: oracledb.Connection,
-                   schema: str,
-                   table_name: str,
-                   output_path_prefix: str
-                   ):
+    def export_table(self,
+                     connection: oracledb.Connection,
+                     schema: str,
+                     table_name: str,
+                     output_path_prefix: str
+                     ):
         column_sql = self.get_column_sql(connection=connection,
                                          schema=schema,
                                          table_name=table_name
                                          )
 
         if column_sql == "":
-            self.logger.warning(f"Table: {schema}.{table_name} has no eligible dump columns, skipping.")
+            self.logger.warning(f"Table: {schema}.{table_name} has no eligible export columns, skipping.")
             return
 
         sql = f"SELECT {column_sql} FROM \"{schema}\".\"{table_name}\""
         if self.row_limit != NO_ROW_LIMIT:
             sql += f" FETCH FIRST {self.row_limit} ROWS ONLY"
 
-        self.logger.info(msg=f"Dumping table: {schema}.{table_name} - SQL: {sql}")
+        self.logger.info(msg=f"Exporting table: {schema}.{table_name} - SQL: {sql}")
 
         pq_writer = None
-        rows_dumped = 0
+        rows_exported = 0
 
         Path(output_path_prefix).mkdir(parents=True, exist_ok=True)
         file_number = 0
@@ -161,7 +160,7 @@ class OracleParquetExporter:
             pyarrow_table = pyarrow.Table.from_arrays(
                 arrays=odf.column_arrays(), names=odf.column_names()
             )
-            rows_dumped += pyarrow_table.num_rows
+            rows_exported += pyarrow_table.num_rows
 
             if not pq_writer:
                 file_name = f"{output_path_prefix}/{table_name.lower() if self.lowercase_object_names else table_name}_{file_number}.parquet"
@@ -187,7 +186,7 @@ class OracleParquetExporter:
             if pq_writer.is_open:
                 pq_writer.close()
 
-        self.logger.info(f"Wrote {rows_dumped:,} row(s) to {output_path_prefix} - table: {schema}.{table_name}")
+        self.logger.info(f"Wrote {rows_exported:,} row(s) to {output_path_prefix} - table: {schema}.{table_name}")
 
     def get_tables(self,
                    connection: oracledb.Connection,
@@ -217,7 +216,7 @@ class OracleParquetExporter:
 
         return object_list
 
-    def dump_tables(self):
+    def export_tables(self):
         with self.get_db_connection() as connection:
             # Set the isolation level
             with connection.cursor() as cursor:
@@ -252,16 +251,16 @@ class OracleParquetExporter:
                         for table_name in table_list:
                             table_output_path = Path(
                                 f"{schema_output_path_prefix}/{table_name.lower() if self.lowercase_object_names else table_name}")
-                            with Timer(name=f"Dumping table: {schema}.{table_name} - to path: {table_output_path}",
+                            with Timer(name=f"Exporting table: {schema}.{table_name} - to path: {table_output_path}",
                                        text=TIMER_TEXT,
                                        initial_text=True,
                                        logger=self.logger.info
                                        ):
-                                self.dump_table(connection=connection,
-                                                schema=schema,
-                                                table_name=table_name,
-                                                output_path_prefix=table_output_path
-                                                )
+                                self.export_table(connection=connection,
+                                                  schema=schema,
+                                                  table_name=table_name,
+                                                  output_path_prefix=table_output_path
+                                                  )
 
 
 def exporter(version: bool,
@@ -283,7 +282,7 @@ def exporter(version: bool,
              parquet_max_file_size: int,
              log_level: str):
     if version:
-        print(f"Oracle Parquet Exporter - version: {app_version}")
+        print(f"GizmoData™ Oracle Parquet Exporter - version: {app_version}")
         return
 
     logger.setLevel(level=getattr(logging, log_level))
@@ -312,7 +311,7 @@ def exporter(version: bool,
                                                     logger=logger
                                                     )
 
-    oracle_parquet_exporter.dump_tables()
+    oracle_parquet_exporter.export_tables()
 
 
 @click.command()
@@ -442,7 +441,7 @@ def exporter(version: bool,
     default=False,
     show_default=True,
     required=True,
-    help="Controls whether the dump utility lower-cases the object names (i.e. schema, table, and column names)."
+    help="Controls whether the export utility lower-cases the object names (i.e. schema, table, and column names)."
 )
 @click.option(
     "--parquet-max-file-size",
